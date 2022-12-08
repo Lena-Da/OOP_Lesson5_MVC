@@ -3,6 +3,7 @@ package personal.views;
 import personal.controllers.UserController;
 import personal.model.User;
 
+import java.util.List;
 import java.util.Scanner;
 
 public class ViewUser {
@@ -18,24 +19,43 @@ public class ViewUser {
 
         while (true) {
             String command = prompt("Введите команду: ");
+            try{
             com = Commands.valueOf(command);
-            if (com == Commands.EXIT) return;
-            switch (com) {
-                case CREATE:
-                    String firstName = prompt("Имя: ");
-                    String lastName = prompt("Фамилия: ");
-                    String phone = prompt("Номер телефона: ");
-                    userController.saveUser(new User(firstName, lastName, phone));
-                    break;
-                case READ:
-                    String id = prompt("Идентификатор пользователя: ");
-                    try {
-                        User user = userController.readUser(id);
-                        System.out.println(user);
-                    } catch (Exception e) {
-                        throw new RuntimeException(e);
-                    }
-                    break;
+            }
+            catch (IllegalArgumentException e){
+                System.out.println("Unidentified command");
+            }
+            if (com == Commands.EXIT)
+                return;
+            try {
+                switch (com) {
+                    case CREATE:
+                        User user = setUser(false);
+                        userController.saveUser(user);
+                        break;
+                    case READ:
+                        String id = prompt("Идентификатор пользователя: ");
+                        User readedUser = userController.readUser(id);
+                        System.out.println(readedUser);
+                        break;
+                    case LIST:
+                        List<User> userList = userController.readUserList();
+                        for (User u : userList) {
+                            System.out.println(u);
+                            System.out.println();
+                        }
+                        break;
+                    case UPDATE:
+                        User updateUser = setUser(true);
+                        userController.updateUser(updateUser);
+                    case DELETE:
+                        String userId = prompt("ID: ");
+                        User deleteUser = userController.readUser(userId);
+                        userController.deleteUser(deleteUser);
+                        break;
+                }
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
             }
         }
     }
@@ -44,5 +64,21 @@ public class ViewUser {
         Scanner in = new Scanner(System.in);
         System.out.print(message);
         return in.nextLine();
+    }
+
+    private User setUser(boolean forUpdate) {
+        String idString = "";
+        if (forUpdate) {
+            idString = prompt("ID: ");
+        }
+
+        String firstName = prompt("Имя: ");
+        String lastName = prompt("Фамилия: ");
+        String phone = prompt("Номер телефона: ");
+        if (forUpdate) {
+            return new User(idString, firstName, lastName, phone);
+        } else {
+            return new User(firstName, lastName, phone);
+        }
     }
 }

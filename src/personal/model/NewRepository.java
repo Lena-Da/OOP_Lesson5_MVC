@@ -1,13 +1,12 @@
 package personal.model;
-
 import java.util.ArrayList;
 import java.util.List;
 
-public class RepositoryFile implements Repository {
-    private UserMapper mapper = new UserMapper();
+public class NewRepository implements Repository{
+    private NewUserMapper mapper = new NewUserMapper();
     private FileOperation fileOperation;
 
-    public RepositoryFile(FileOperation fileOperation) {
+    public NewRepository(FileOperation fileOperation) {
         this.fileOperation = fileOperation;
     }
 
